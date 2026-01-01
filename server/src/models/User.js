@@ -51,6 +51,10 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  ancestors: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+}],
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

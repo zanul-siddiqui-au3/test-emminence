@@ -63,6 +63,7 @@ const register = async (req, res) => {
 
     // Hash password
     const hashedPassword = await hashPassword(password);
+    const ancestors = parent ? [...parent.ancestors, parentId] : [];
 
     // Create user
     const user = await User.create({
@@ -70,6 +71,7 @@ const register = async (req, res) => {
       email,
       password: hashedPassword,
       parentId: parentId || null,
+      ancestors,
       createdBy
     });
 
