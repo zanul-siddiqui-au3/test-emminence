@@ -125,9 +125,6 @@ const getBalanceSummary = async (userId) => {
 // Get detailed balance statement with credit/debit breakdown
 const getBalanceStatement = async (userId, filters = {}) => {
   // Only show transactions that actually affect this user:
-  // - For 'credit' type: user must be the receiver
-  // - For 'debit' type: user must be the sender
-  // - For 'recharge' type: user must be the receiver
   const query = {
     $or: [
       { type: 'credit', receiverId: userId },
@@ -158,7 +155,6 @@ const getBalanceStatement = async (userId, filters = {}) => {
   // Format transactions with clear debit/credit indication
   const formattedTransactions = transactions.map(txn => {
     const isCredit = txn.receiverId._id.toString() === userId.toString();
-    const isDebit = txn.senderId && txn.senderId._id.toString() === userId.toString();
 
     return {
       _id: txn._id,

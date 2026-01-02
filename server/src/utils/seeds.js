@@ -17,8 +17,7 @@ const seedDatabase = async () => {
     }
 
     // Create admin user
-    const hashedPassword = await hashPassword('Admin@123');
-    const admin = await User.create({
+    const hashedPassword = await hashPassword('Admin@123');await User.create({
       username: 'admin',
       email: 'admin@example.com',
       password: hashedPassword,
@@ -27,7 +26,6 @@ const seedDatabase = async () => {
       parentId: null,
       isActive: true
     });
-
     
     process.exit(0);
   } catch (error) {

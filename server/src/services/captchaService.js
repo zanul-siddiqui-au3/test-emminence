@@ -33,15 +33,14 @@ setInterval(() => {
  */
 const generateCaptcha = (ipAddress = null) => {
   const captcha = svgCaptcha.create({
-    size: 6, // 6 characters
-    noise: 2, // Noise level
-    color: true, // Colored characters
+    size: 6, 
+    noise: 2, 
+    color: true,
     background: '#f0f0f0' // Light gray background
   });
 
   const sessionId = generateUniqueId();
   
-  // Store CAPTCHA session with timestamp and optional IP binding
   captchaSessions.set(sessionId, {
     text: captcha.text.toLowerCase(),
     timestamp: Date.now(),
