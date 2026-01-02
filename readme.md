@@ -2,6 +2,8 @@
   Node.js v20.19.2
   Angular 14
   mongodb 5
+# Api Docs 
+  http://localhost:3000/api-docs/#/
 
 # First Step Clone
   Clone Repo
