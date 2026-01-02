@@ -1,0 +1,226 @@
+.container {
+  max-width: 1200px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.summary-card {
+  margin-bottom: 24px;
+
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 24px;
+
+    .summary-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      mat-icon {
+        font-size: 48px;
+        width: 48px;
+        height: 48px;
+      }
+
+      h3 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 600;
+      }
+
+      p {
+        margin: 4px 0 0 0;
+        color: #666;
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+.tree-container {
+  padding: 24px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+mat-tree {
+  background: transparent;
+  
+  mat-tree-node,
+  mat-nested-tree-node {
+    min-height: 56px;
+    padding: 4px 0;
+  }
+}
+
+.tree-node {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  margin: 4px 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+
+  &:hover {
+    background: #f5f5f5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transform: translateX(4px);
+  }
+
+  button {
+    margin-right: 4px;
+  }
+
+  .user-icon {
+    margin: 0 12px;
+    color: #666;
+  }
+
+  .user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+
+    strong {
+      font-size: 16px;
+      color: #333;
+      font-weight: 600;
+    }
+
+    .email {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .balance {
+      font-size: 14px;
+      color: #4caf50;
+      font-weight: 600;
+    }
+
+    .children-count {
+      font-size: 11px;
+      color: #999;
+      font-style: italic;
+      margin-top: 2px;
+    }
+  }
+}
+
+// Nested tree styling with proper indentation
+mat-nested-tree-node {
+  > div[role="group"] {
+    padding-left: 48px;
+    border-left: 2px solid #e0e0e0;
+    margin-left: 24px;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: -2px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, #3f51b5 0%, transparent 100%);
+    }
+  }
+}
+
+.tree-invisible {
+  display: none;
+}
+
+// Root node special styling
+mat-tree > mat-nested-tree-node:first-child {
+  > .tree-node {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+
+    .user-icon {
+      color: white;
+    }
+
+    .user-info {
+      strong {
+        color: white;
+      }
+
+      .email {
+        color: rgba(255,255,255,0.9);
+      }
+
+      .balance {
+        color: #fff176;
+      }
+
+      .children-count {
+        color: rgba(255,255,255,0.8);
+      }
+    }
+  }
+}
+
+.no-data {
+  text-align: center;
+  padding: 48px;
+  color: #999;
+  margin-bottom: 16px;
+
+  button {
+    margin-top: 16px;
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 48px;
+}
+
+// Level indicators with different colors
+mat-nested-tree-node {
+  mat-nested-tree-node {
+    > div[role="group"] {
+      border-left-color: #90caf9;
+      
+      &::before {
+        background: linear-gradient(to bottom, #90caf9 0%, transparent 100%);
+      }
+    }
+
+    mat-nested-tree-node {
+      > div[role="group"] {
+        border-left-color: #ffb74d;
+        
+        &::before {
+          background: linear-gradient(to bottom, #ffb74d 0%, transparent 100%);
+        }
+      }
+
+      mat-nested-tree-node {
+        > div[role="group"] {
+          border-left-color: #81c784;
+          
+          &::before {
+            background: linear-gradient(to bottom, #81c784 0%, transparent 100%);
+          }
+        }
+      }
+    }
+  }
+}

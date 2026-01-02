@@ -6,14 +6,17 @@ const { generateCaptcha, verifyCaptcha } = require('../services/captchaService')
 // Get CAPTCHA
 const getCaptcha = async (req, res) => {
   try {
-    const captcha = generateCaptcha();
+    // Get client IP address for session binding
+    const ipAddress = req.ip || req.connection.remoteAddress;
+    const captcha = generateCaptcha(ipAddress);
     
     res.status(200).json({
       status: 'success',
       data: {
         sessionId: captcha.sessionId,
         svg: captcha.svg
-      }
+      },
+      message: 'CAPTCHA generated successfully. Valid for 5 minutes.'
     });
   } catch (error) {
     console.error('Get CAPTCHA error:', error);
@@ -107,8 +110,9 @@ const login = async (req, res) => {
       });
     }
 
-    // Verify CAPTCHA
-    const captchaResult = verifyCaptcha(captchaSessionId, captchaText);
+    // Verify CAPTCHA with IP address binding
+    const ipAddress = req.ip || req.connection.remoteAddress;
+    const captchaResult = verifyCaptcha(captchaSessionId, captchaText, ipAddress);
     if (!captchaResult.valid) {
       return res.status(400).json({
         status: 'error',
@@ -142,26 +146,23 @@ const login = async (req, res) => {
       });
     }
 
-    // Generate tokens
     const accessToken = generateAccessToken(user._id);
     const refreshToken = generateRefreshToken(user._id);
 
-    // Save refresh token to database
     user.refreshToken = refreshToken;
     await user.save();
 
-    // Set HTTP-only cookies
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
       maxAge: 15 * 60 * 1000 // 15 minutes
     });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
@@ -214,7 +215,7 @@ const refreshToken = async (req, res) => {
     res.cookie('accessToken', newAccessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
       maxAge: 15 * 60 * 1000
     });
 

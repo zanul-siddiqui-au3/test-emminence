@@ -22,13 +22,31 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTreeModule } from '@angular/material/tree';
 
 import { HttpConfigInterceptor } from './interceptors/http-interceptor';
-
+import { LoginComponent } from './components/auth/login/login.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { MyChildrenComponent } from './components/users/my-children/my-children.component';
+import { CreateChildComponent } from './components/users/create-child/create-child.component';
+import { BalanceComponent } from './components/wallet/balance/balance.component';
+import { TransactionsComponent } from './components/wallet/transactions/transactions.component';
+import { NavbarComponent } from './layout/navbar/navbar.component';
+import { HieearchyComponent } from './components/users/hiearchy/hiearchy.component';
+import { DashboardComponent as AdminDashboardComponent } from './components/admin/dashboard/dashboard.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    LoginComponent,
+    DashboardComponent,
+    MyChildrenComponent,
+    CreateChildComponent,
+    BalanceComponent,
+    TransactionsComponent,
+    NavbarComponent,
+    HieearchyComponent,
+    AdminDashboardComponent
   ],
   imports: [
     BrowserModule,
@@ -52,7 +70,8 @@ import { HttpConfigInterceptor } from './interceptors/http-interceptor';
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatDialogModule,
-    MatSelectModule
+    MatSelectModule,
+    MatTreeModule
   ],
   providers: [
     {

@@ -1,0 +1,170 @@
+<div class="transactions-container">
+  <div class="page-header">
+    <h2><mat-icon>receipt_long</mat-icon> Balance Statement</h2>
+    <p class="subtitle">View all your transaction history and balance details</p>
+  </div>
+
+  <!-- Error Alert -->
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <mat-icon>error_outline</mat-icon>
+    {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''"></button>
+  </div>
+
+  <!-- Summary Cards -->
+  <div *ngIf="balanceStatement" class="summary-cards">
+    <mat-card class="summary-card balance-card">
+      <mat-card-content>
+        <div class="card-icon">
+          <mat-icon>account_balance_wallet</mat-icon>
+        </div>
+        <div class="card-details">
+          <h6>Current Balance</h6>
+          <h3>${{ balanceStatement.currentBalance | number:'1.2-2' }}</h3>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card credit-card">
+      <mat-card-content>
+        <div class="card-icon">
+          <mat-icon>arrow_downward</mat-icon>
+        </div>
+        <div class="card-details">
+          <h6>Total Credit</h6>
+          <h3>${{ balanceStatement.totalCredit | number:'1.2-2' }}</h3>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="summary-card debit-card">
+      <mat-card-content>
+        <div class="card-icon">
+          <mat-icon>arrow_upward</mat-icon>
+        </div>
+        <div class="card-details">
+          <h6>Total Debit</h6>
+          <h3>${{ balanceStatement.totalDebit | number:'1.2-2' }}</h3>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Loading transactions...</p>
+  </div>
+
+  <!-- Transactions Table -->
+  <mat-card *ngIf="!loading && transactions.length > 0" class="transactions-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>history</mat-icon>
+        Transaction History
+        <span class="transaction-count">({{ balanceStatement?.transactionCount || 0 }})</span>
+      </mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="table-responsive">
+        <table mat-table [dataSource]="transactions" class="transactions-table">
+          
+          <!-- Date Column -->
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Date & Time</th>
+            <td mat-cell *matCellDef="let txn">
+              <div class="date-cell">
+                <mat-icon class="date-icon">event</mat-icon>
+                <span>{{ txn.timestamp | date:'MMM d, y, h:mm a' }}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Type Column -->
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef>Type</th>
+            <td mat-cell *matCellDef="let txn">
+              <div class="type-cell">
+                <span class="badge" [ngClass]="{
+                  'badge-credit': txn.transactionType === 'CREDIT',
+                  'badge-debit': txn.transactionType === 'DEBIT'
+                }">
+                  <mat-icon>{{ txn.transactionType === 'CREDIT' ? 'call_received' : 'call_made' }}</mat-icon>
+                  {{ txn.transactionType }}
+                </span>
+                <small class="txn-subtype">{{ txn.type }}</small>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Description Column -->
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef>Description</th>
+            <td mat-cell *matCellDef="let txn">
+              <span class="description">{{ txn.description || 'No description' }}</span>
+            </td>
+          </ng-container>
+
+          <!-- Sender Column -->
+          <ng-container matColumnDef="sender">
+            <th mat-header-cell *matHeaderCellDef>Sender</th>
+            <td mat-cell *matCellDef="let txn">
+              <div *ngIf="txn.sender" class="user-info">
+                <mat-icon class="user-icon">person</mat-icon>
+                <div>
+                  <strong>{{ txn.sender.username }}</strong>
+                  <small>{{ txn.sender.email }}</small>
+                </div>
+              </div>
+              <span *ngIf="!txn.sender" class="text-muted">—</span>
+            </td>
+          </ng-container>
+
+          <!-- Receiver Column -->
+          <ng-container matColumnDef="receiver">
+            <th mat-header-cell *matHeaderCellDef>Receiver</th>
+            <td mat-cell *matCellDef="let txn">
+              <div *ngIf="txn.receiver" class="user-info">
+                <mat-icon class="user-icon">person</mat-icon>
+                <div>
+                  <strong>{{ txn.receiver.username }}</strong>
+                  <small>{{ txn.receiver.email }}</small>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Amount Column -->
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef class="text-end">Amount</th>
+            <td mat-cell *matCellDef="let txn" class="text-end">
+              <span class="amount" [ngClass]="getTransactionClass(txn)">
+                {{ txn.transactionType === 'CREDIT' ? '+' : '-' }}${{ txn.amount | number:'1.2-2' }}
+              </span>
+            </td>
+          </ng-container>
+
+          <!-- Balance After Column -->
+          <ng-container matColumnDef="balance">
+            <th mat-header-cell *matHeaderCellDef class="text-end">Balance After</th>
+            <td mat-cell *matCellDef="let txn" class="text-end">
+              <span class="balance-after">${{ txn.balanceAfter | number:'1.2-2' }}</span>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="['date', 'type', 'description', 'sender', 'receiver', 'amount', 'balance']"></tr>
+          <tr mat-row *matRowDef="let row; columns: ['date', 'type', 'description', 'sender', 'receiver', 'amount', 'balance'];" class="transaction-row"></tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- No Transactions -->
+  <mat-card *ngIf="!loading && transactions.length === 0" class="no-data-card">
+    <mat-card-content>
+      <mat-icon class="no-data-icon">inbox</mat-icon>
+      <h4>No Transactions Found</h4>
+      <p>You haven't made any transactions yet.</p>
+    </mat-card-content>
+  </mat-card>
+</div>

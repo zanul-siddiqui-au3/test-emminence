@@ -16,6 +16,15 @@ const createChildUser = async (req, res) => {
       });
     }
 
+    const parent = await User.findById(parentId);
+
+        if (!parent) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Parent user not found'
+      });
+    }
+
     // Check if user already exists
     const existingUser = await User.findOne({
       $or: [{ username }, { email }]
@@ -29,12 +38,18 @@ const createChildUser = async (req, res) => {
     }
 
     const hashedPassword = await hashPassword(password);
+    
+    const ancestors = [...(parent.ancestors || []), parent._id];
 
     const newUser = await User.create({
       username,
       email,
       password: hashedPassword,
       parentId,
+      createdBy: parentId,
+      ancestors,
+      walletBalance: 0,
+      isActive: true,
       createdBy: parentId
     });
 
@@ -160,10 +175,39 @@ const getUserDetails = async (req, res) => {
   }
 };
 
+const getHierarchyTree = async (userId) => {
+  const user = await User.findById(userId).select('-password -refreshToken').lean();
+  
+  if (!user) {
+    return null;
+  }
+
+  const buildTree = async (parentId) => {
+    const children = await User.find({ parentId })
+      .select('-password -refreshToken')
+      .lean();
+    
+    for (let child of children) {
+      child.children = await buildTree(child._id);
+    }
+    
+    return children;
+  };
+
+  const children = await buildTree(userId);
+  
+  return {
+    ...user,
+    children
+  };
+};
+
+
 module.exports = {
   createChildUser,
   getMyChildren,
   getMyHierarchy,
   changeChildPassword,
-  getUserDetails
+  getUserDetails,
+  getHierarchyTree
 };

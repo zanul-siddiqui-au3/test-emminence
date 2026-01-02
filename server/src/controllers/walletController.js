@@ -97,8 +97,8 @@ const rechargeWallet = async (req, res) => {
   }
 };
 
-// Get transaction history
-const getTransactions = async (req, res) => {
+// Get detailed balance statement
+const getBalanceStatement = async (req, res) => {
   try {
     const { type, startDate, endDate, limit } = req.query;
 
@@ -109,24 +109,21 @@ const getTransactions = async (req, res) => {
       limit: parseInt(limit) || 100
     };
 
-    const transactions = await walletService.getUserTransactions(
+    const statement = await walletService.getBalanceStatement(
       req.user._id,
       filters
     );
 
     res.status(200).json({
       status: 'success',
-      data: {
-        count: transactions.length,
-        transactions
-      }
+      data: statement
     });
 
   } catch (error) {
-    console.error('Get transactions error:', error);
+    console.error('Get balance statement error:', error);
     res.status(500).json({
       status: 'error',
-      message: 'Failed to get transactions'
+      message: 'Failed to get balance statement'
     });
   }
 };
@@ -154,6 +151,6 @@ module.exports = {
   getBalance,
   creditToChild,
   rechargeWallet,
-  getTransactions,
+  getBalanceStatement,
   getBalanceSummary
 };

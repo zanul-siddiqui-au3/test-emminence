@@ -1,0 +1,45 @@
+
+<div class="container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Create Child User</mat-card-title>
+      <mat-card-subtitle>Add a new direct child user</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="createForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Username</mat-label>
+          <input matInput formControlName="username">
+          <mat-icon matPrefix>person</mat-icon>
+          <mat-error *ngIf="createForm.get('username')?.hasError('required')">Required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email">
+          <mat-icon matPrefix>email</mat-icon>
+          <mat-error *ngIf="createForm.get('email')?.hasError('required')">Required</mat-error>
+          <mat-error *ngIf="createForm.get('email')?.hasError('email')">Invalid email</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
+          <mat-icon matPrefix>lock</mat-icon>
+          <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          <mat-error *ngIf="createForm.get('password')?.hasError('required')">Required</mat-error>
+        </mat-form-field>
+
+        <div class="actions">
+          <button mat-raised-button type="button" routerLink="/users/my-children">Cancel</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="createForm.invalid || loading">
+            Create User
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

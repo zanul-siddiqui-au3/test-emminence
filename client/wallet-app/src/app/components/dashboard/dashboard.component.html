@@ -1,0 +1,29 @@
+
+<div class="dashboard-container">
+  <h1>Welcome, {{ currentUser?.username }}!</h1>
+  
+  <div class="balance-card">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>Wallet Balance</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <h2 *ngIf="!loading">₹{{ balance | number:'1.2-2' }}</h2>
+        <mat-spinner *ngIf="loading" diameter="40"></mat-spinner>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div class="quick-actions">
+    <h3>Quick Actions</h3>
+    <button mat-raised-button color="primary" routerLink="/users/my-children">
+      <mat-icon>people</mat-icon> My Children
+    </button>
+    <button mat-raised-button color="accent" routerLink="/users/create-child">
+      <mat-icon>person_add</mat-icon> Create Child User
+    </button>
+    <button mat-raised-button routerLink="/wallet/transactions">
+      <mat-icon>receipt</mat-icon> Transactions
+    </button>
+  </div>
+</div>

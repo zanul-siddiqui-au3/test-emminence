@@ -59,7 +59,7 @@ router.post('/credit', authMiddleware, walletController.creditToChild);
  * @swagger
  * /api/wallet/recharge:
  *   post:
- *     summary: Recharge wallet (Admin only)
+ *     summary: Recharge wallet (Admin or Owner only)
  *     tags: [Wallet]
  *     security:
  *       - cookieAuth: []
@@ -80,13 +80,13 @@ router.post('/credit', authMiddleware, walletController.creditToChild);
  *       200:
  *         description: Wallet recharged successfully
  */
-router.post('/recharge', authMiddleware, checkRole('admin'), walletController.rechargeWallet);
+router.post('/recharge', authMiddleware, walletController.rechargeWallet);
 
 /**
  * @swagger
- * /api/wallet/transactions:
+ * /api/wallet/statement:
  *   get:
- *     summary: Get transaction history
+ *     summary: Get detailed balance statement with credit/debit breakdown
  *     tags: [Wallet]
  *     security:
  *       - cookieAuth: []
@@ -96,14 +96,24 @@ router.post('/recharge', authMiddleware, checkRole('admin'), walletController.re
  *         schema:
  *           type: string
  *       - in: query
+ *         name: startDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
+ *         name: endDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *       - in: query
  *         name: limit
  *         schema:
  *           type: number
  *     responses:
  *       200:
- *         description: Transactions retrieved successfully
+ *         description: Balance statement retrieved with sender/receiver details
  */
-router.get('/transactions', authMiddleware, walletController.getTransactions);
+router.get('/statement', authMiddleware, walletController.getBalanceStatement);
 
 /**
  * @swagger

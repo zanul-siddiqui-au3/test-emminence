@@ -1,0 +1,55 @@
+<mat-toolbar color="primary" *ngIf="currentUser">
+  <span class="logo" routerLink="/dashboard">💰 Wallet System</span>
+  
+  <span class="spacer"></span>
+
+  <button mat-button routerLink="/dashboard">
+    <mat-icon>dashboard</mat-icon> Dashboard
+  </button>
+
+  <button mat-button [matMenuTriggerFor]="userMenu">
+    <mat-icon>people</mat-icon> Users
+  </button>
+  <mat-menu #userMenu="matMenu">
+    <button mat-menu-item routerLink="/users/my-children">
+      <mat-icon>group</mat-icon> My Children
+    </button>
+    <button mat-menu-item routerLink="/users/create-child">
+      <mat-icon>person_add</mat-icon> Create Child
+    </button>
+    <button mat-menu-item routerLink="/users/hierarchy">
+      <mat-icon>account_tree</mat-icon> View Hierarchy
+    </button>
+  </mat-menu>
+
+  <button mat-button [matMenuTriggerFor]="walletMenu">
+    <mat-icon>account_balance_wallet</mat-icon> Wallet
+  </button>
+  <mat-menu #walletMenu="matMenu">
+    <button mat-menu-item routerLink="/wallet/balance">
+      <mat-icon>account_balance</mat-icon> Balance & Credit
+    </button>
+    <button mat-menu-item routerLink="/wallet/transactions">
+      <mat-icon>receipt</mat-icon> Balance Statement
+    </button>
+  </mat-menu>
+
+  <button mat-button routerLink="/admin/dashboard" *ngIf="currentUser?.role === 'admin'">
+    <mat-icon>admin_panel_settings</mat-icon> Admin
+  </button>
+
+  <button mat-button [matMenuTriggerFor]="profileMenu">
+    <mat-icon>account_circle</mat-icon> {{ currentUser?.username }}
+  </button>
+  <mat-menu #profileMenu="matMenu">
+    <div mat-menu-item disabled class="user-info">
+      <div><strong>{{ currentUser?.username }}</strong></div>
+      <div class="user-email">{{ currentUser?.email }}</div>
+      <div class="user-role">{{ currentUser?.role }}</div>
+    </div>
+    <mat-divider></mat-divider>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon> Logout
+    </button>
+  </mat-menu>
+</mat-toolbar>

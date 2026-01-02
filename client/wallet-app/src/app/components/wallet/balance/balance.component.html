@@ -1,0 +1,189 @@
+<div class="balance-container">
+  <div class="page-header">
+    <h2><mat-icon>account_balance_wallet</mat-icon> Wallet Management</h2>
+    <p class="subtitle">Manage your wallet balance and transfer funds</p>
+  </div>
+
+  <!-- Alert Messages -->
+  <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <mat-icon>error_outline</mat-icon>
+    {{ error }}
+    <button type="button" class="btn-close" (click)="error = ''"></button>
+  </div>
+  <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
+    <mat-icon>check_circle_outline</mat-icon>
+    {{ success }}
+    <button type="button" class="btn-close" (click)="success = ''"></button>
+  </div>
+
+  <!-- Balance Cards -->
+  <div class="balance-cards">
+    <mat-card class="balance-card primary-card">
+      <mat-card-content>
+        <div class="card-icon">
+          <mat-icon>account_balance_wallet</mat-icon>
+        </div>
+        <div class="card-details">
+          <h6>Current Balance</h6>
+          <h3>${{ balance | number:'1.2-2' }}</h3>
+          <p class="card-label">Available Funds</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+    
+    <mat-card class="balance-card info-card" *ngIf="balanceSummary">
+      <mat-card-content>
+        <div class="card-icon">
+          <mat-icon>account_tree</mat-icon>
+        </div>
+        <div class="card-details">
+          <h6>Downline Balance</h6>
+          <h3>${{ balanceSummary.downlineBalance | number:'1.2-2' }}</h3>
+          <p class="card-label">Total in Network</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+    
+    <mat-card class="balance-card success-card" *ngIf="balanceSummary">
+      <mat-card-content>
+        <div class="card-icon">
+          <mat-icon>trending_up</mat-icon>
+        </div>
+        <div class="card-details">
+          <h6>Total Balance</h6>
+          <h3>${{ balanceSummary.totalBalance | number:'1.2-2' }}</h3>
+          <p class="card-label">Combined Funds</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="action-buttons">
+    <button *ngIf="canRecharge()" mat-raised-button color="primary" class="action-btn" (click)="toggleRechargeForm()">
+      <mat-icon>add_circle</mat-icon>
+      Recharge Wallet
+    </button>
+    <button mat-raised-button color="accent" class="action-btn" (click)="toggleCreditForm()">
+      <mat-icon>send</mat-icon>
+      Credit to Child
+    </button>
+  </div>
+
+  <!-- Recharge Form -->
+  <mat-card *ngIf="showRechargeForm" class="form-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>add_circle</mat-icon>
+        Recharge Wallet
+      </mat-card-title>
+      <mat-card-subtitle>Add funds to your wallet balance</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <form (ngSubmit)="recharge()" class="form-content">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Amount</mat-label>
+          <input 
+            matInput
+            type="number" 
+            [(ngModel)]="rechargeAmount" 
+            name="rechargeAmount"
+            min="0.01"
+            step="0.01"
+            required>
+          <span matPrefix>$&nbsp;</span>
+          <mat-icon matSuffix>attach_money</mat-icon>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description (Optional)</mat-label>
+          <textarea 
+            matInput
+            [(ngModel)]="rechargeDescription" 
+            name="rechargeDescription"
+            rows="3"></textarea>
+          <mat-icon matSuffix>description</mat-icon>
+        </mat-form-field>
+        
+        <div class="form-actions">
+          <button type="submit" mat-raised-button color="primary" [disabled]="loading">
+            <mat-spinner *ngIf="loading" diameter="20" class="button-spinner"></mat-spinner>
+            <mat-icon *ngIf="!loading">check</mat-icon>
+            Recharge Now
+          </button>
+          <button type="button" mat-stroked-button (click)="toggleRechargeForm()" [disabled]="loading">
+            <mat-icon>close</mat-icon>
+            Cancel
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Credit Form -->
+  <mat-card *ngIf="showCreditForm" class="form-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>send</mat-icon>
+        Credit Balance to Child
+      </mat-card-title>
+      <mat-card-subtitle>Transfer funds to a child user in your network</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <form (ngSubmit)="creditToChild()" class="form-content">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Select Child User</mat-label>
+          <mat-select 
+            [(ngModel)]="creditUserId" 
+            name="creditUser"
+            required>
+            <mat-option value="">-- Select User --</mat-option>
+            <mat-option *ngFor="let child of myChildren" [value]="child._id">
+              <span class="user-name">{{ child.username }}</span>
+              <span class="user-email">({{ child.email }})</span>
+            </mat-option>
+          </mat-select>
+          <mat-icon matSuffix>person</mat-icon>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Amount</mat-label>
+          <input 
+            matInput
+            type="number" 
+            [(ngModel)]="creditAmount" 
+            name="creditAmount"
+            min="0.01"
+            step="0.01"
+            [max]="balance"
+            required>
+          <span matPrefix>$&nbsp;</span>
+          <mat-icon matSuffix>attach_money</mat-icon>
+          <mat-hint>Available: ${{ balance | number:'1.2-2' }}</mat-hint>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description (Optional)</mat-label>
+          <textarea 
+            matInput
+            [(ngModel)]="creditDescription" 
+            name="creditDescription"
+            rows="3"></textarea>
+          <mat-icon matSuffix>description</mat-icon>
+        </mat-form-field>
+        
+        <div class="form-actions">
+          <button type="submit" mat-raised-button color="accent" [disabled]="loading">
+            <mat-spinner *ngIf="loading" diameter="20" class="button-spinner"></mat-spinner>
+            <mat-icon *ngIf="!loading">send</mat-icon>
+            Credit Balance
+          </button>
+          <button type="button" mat-stroked-button (click)="toggleCreditForm()" [disabled]="loading">
+            <mat-icon>close</mat-icon>
+            Cancel
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -3,7 +3,7 @@ import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from
 import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { map, catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { of, take } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -15,21 +15,27 @@ export class AuthGuard implements CanActivate {
     private router: Router
   ) {}
 
-  canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): Observable<boolean> {
-    return this.authService.isAuthenticated().pipe(
-      map(isAuth => {
-        if (isAuth) {
+  canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
+    const currentUser = this.authService.currentUserValue;
+    if (currentUser) {
+      return of(true);
+    }
+
+    // Try to get profile to check if user is authenticated
+    return this.authService.getProfile().pipe(
+      take(1),
+      map(response => {
+        if (response.status === 'success' && response.data) {
           return true;
         } else {
-          this.router.navigate(['/login']);
+          // Not authenticated, redirect to login
+          this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
           return false;
         }
       }),
-      catchError(() => {
-        this.router.navigate(['/login']);
+      catchError((error) => {
+        // Error getting profile (likely 401), redirect to login
+        this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
         return of(false);
       })
     );
