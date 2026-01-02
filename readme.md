@@ -1,3 +1,8 @@
+# Technologies Used
+  # Node.js v20.19.2
+  # Angular 14
+  # mongodb 5
+
 # First Step Clone
 Clone Repo
 # Go inside server folder
